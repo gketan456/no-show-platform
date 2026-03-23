@@ -34,7 +34,7 @@ export const createPrediction = async (req, res, next) => {
             return handleResponse(res, 400, "appointment_id is required");
         }
 
-        const mlResponse = await axios.post("http://localhost:8000/predict", {
+        const mlResponse = await axios.post(`${process.env.ML_SERVICE_URL}/predict`, {
             Gender,
             Age,
             Neighbourhood,
