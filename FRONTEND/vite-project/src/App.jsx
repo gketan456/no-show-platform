@@ -3,21 +3,19 @@ import Step1PatientDetails from './pages/Step1PatientDetails';
 import Step2AppointmentDate from './pages/Step2AppointmentDate';
 import Step3MedicalDetails from './pages/Step3MedicalDetails';
 import Step4Result from './pages/Step4Result';
+import AuthPage from './pages/AuthPage';
+import AdminDashboard from './pages/AdminDashboard';
 import api from './services/api';
 
 function App() {
 
+    const [currentUser, setCurrentUser] = useState(null);
     const [step, setStep] = useState(1);
 
-    // step 1 data
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
-
-    // step 2 data
     const [appointmentDay, setAppointmentDay] = useState("");
-
-    // step 3 data
     const [age, setAge] = useState("");
     const [gender, setGender] = useState("M");
     const [neighbourhood, setNeighbourhood] = useState("");
@@ -26,14 +24,21 @@ function App() {
     const [scholarship, setScholarship] = useState(false);
     const [alcoholism, setAlcoholism] = useState(false);
     const [handicap, setHandicap] = useState(0);
-
-    // result
     const [prediction, setPrediction] = useState(null);
 
-    // final submit — saves everything and gets prediction
+    const handleLogin = (user) => {
+        setCurrentUser(user);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setCurrentUser(null);
+        setStep(1);
+    };
+
     const handleFinalSubmit = async () => {
         try {
-            // 1. save patient
             const patientResponse = await api.post("/patients", {
                 full_name: fullName,
                 email: email,
@@ -46,12 +51,10 @@ function App() {
                 scholarship: scholarship,
                 alcoholism: alcoholism,
                 handicap: Number(handicap)
-
             });
 
             const patientId = patientResponse.data.data.id;
 
-            // 2. save appointment
             const appointmentResponse = await api.post("/appointments", {
                 patient_id: patientId,
                 scheduled_day: new Date().toISOString(),
@@ -60,24 +63,22 @@ function App() {
 
             const appointmentId = appointmentResponse.data.data.id;
 
-            // 3. get mock prediction
             const predictionResponse = await api.post("/predictions", {
-            appointment_id: appointmentId,
-            Gender: gender,
-            Age: Number(age),
-            Neighbourhood: neighbourhood,
-            ScheduledDay: new Date().toISOString(),
-            AppointmentDay: appointmentDay,
-            Scholarship: scholarship ? 1 : 0,
-            Hipertension: hypertension ? 1 : 0,
-            Diabetes: diabetes ? 1 : 0,
-            Alcoholism: alcoholism ? 1 : 0,
-            Handcap: Number(handicap),
-            patientName: fullName,      
-            patientPhone: phone,  
-            patientEmail: email
-        });
-    
+                appointment_id: appointmentId,
+                Gender: gender,
+                Age: Number(age),
+                Neighbourhood: neighbourhood,
+                ScheduledDay: new Date().toISOString(),
+                AppointmentDay: appointmentDay,
+                Scholarship: scholarship ? 1 : 0,
+                Hipertension: hypertension ? 1 : 0,
+                Diabetes: diabetes ? 1 : 0,
+                Alcoholism: alcoholism ? 1 : 0,
+                Handcap: Number(handicap),
+                patientName: fullName,
+                patientPhone: phone,
+                patientEmail: email
+            });
 
             setPrediction(predictionResponse.data.data);
             setStep(4);
@@ -88,9 +89,29 @@ function App() {
         }
     };
 
+    // not logged in → show auth page
+    if (!currentUser) {
+        return (
+            <div>
+                <h1>No Show Prediction System</h1>
+                <AuthPage onLogin={handleLogin} />
+            </div>
+        );
+    }
+
+    // admin logged in → show admin dashboard
+    if (currentUser.role === "admin") {
+        return (
+            <AdminDashboard onLogout={handleLogout} />
+        );
+    }
+
+    // patient logged in → show booking flow
     return (
         <div>
             <h1>No Show Prediction System</h1>
+            <p>Welcome, {currentUser.name}</p>
+            <button onClick={handleLogout}>Logout</button>
 
             {step === 1 && (
                 <Step1PatientDetails

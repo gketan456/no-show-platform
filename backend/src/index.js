@@ -7,6 +7,8 @@ import createTables from "./db/createTables.js";
 import patientRoutes from "./routes/patientRoutes.js";
 import appointmentRoutes from "./routes/appointmentRoutes.js";
 import predictionRoutes from "./routes/predictionRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 
@@ -33,6 +35,8 @@ app.get("/health", async (req, res, next) => {
   }
 });
 
+app.use("/api", authRoutes);
+app.use("/api", adminRoutes);
 app.use("/api", patientRoutes);
 app.use("/api", appointmentRoutes);
 app.use("/api", predictionRoutes);

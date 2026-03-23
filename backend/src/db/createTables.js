@@ -13,14 +13,22 @@ const createTables = async () => {
   `;
 
   const patientsTable = `
-    CREATE TABLE IF NOT EXISTS patients (
-      id SERIAL PRIMARY KEY,
-      full_name VARCHAR(150) NOT NULL,
-      email VARCHAR(255),
-      phone VARCHAR(30),
-      created_at TIMESTAMP DEFAULT NOW()
-    );
-  `;
+  CREATE TABLE IF NOT EXISTS patients (
+    id SERIAL PRIMARY KEY,
+    full_name VARCHAR(150) NOT NULL,
+    email VARCHAR(255),
+    phone VARCHAR(30),
+    age INTEGER,
+    gender VARCHAR(1),
+    neighbourhood VARCHAR(100),
+    hypertension BOOLEAN DEFAULT FALSE,
+    diabetes BOOLEAN DEFAULT FALSE,
+    scholarship BOOLEAN DEFAULT FALSE,
+    alcoholism BOOLEAN DEFAULT FALSE,
+    handicap INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT NOW()
+  );
+`;
 
   const appointmentsTable = `
     CREATE TABLE IF NOT EXISTS appointments (
