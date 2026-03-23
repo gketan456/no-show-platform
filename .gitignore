@@ -5,7 +5,10 @@ backend/.env
 # frontend
 frontend/node_modules
 frontend/.env
+frontend/dist
 
 # general
 .DS_Store
 *.log
+*.env
+node_modules
